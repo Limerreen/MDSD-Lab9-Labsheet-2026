@@ -702,17 +702,17 @@ final pages = [
 
 > ✅ **Checkpoint 6.1** โพสต์ขายจริงอย่างน้อย 2 รายการผ่านแอป ถ่ายภาพหน้าจอ Firebase Console เมนู Firestore Database ที่แสดง Collection `items` มีเอกสารที่โพสต์เข้ามาจริง พร้อม field `sellerId` ที่ตรงกับ `uid` ของบัญชีที่ใช้ทดสอบ และยืนยันว่าร่างทั้งสองรายการหายไปจาก `MyDraftsPage` แล้ว
 
-```text
-บันทึกรูปผลลัพธ์ที่นี่
-```
+<img width="869" height="1883" alt="image" src="https://github.com/user-attachments/assets/22cf7bd3-5d1c-430b-9721-43c08d63c32e" />
+
+<img width="1917" height="951" alt="image" src="https://github.com/user-attachments/assets/fc4cf695-3597-43ec-9c6b-d6ef5db5cb45" />
+
 
 > ✅ **Checkpoint 6.2** ถ่ายภาพหน้าจอ Firebase Console เมนู Storage ที่แสดงไฟล์รูปภาพที่อัปโหลดสำเร็จ และภาพหน้าจอ Firestore ที่แสดงว่าเอกสารมี field `imageUrl` เป็น URL จริงที่เปิดดูได้ ถ่ายภาพหน้าจอแอปที่แสดงรูปสินค้านั้นบนหน้า Home ผ่าน `Image.network(imageUrl)` ด้วย (ย้อนกลับไปถ่ายภาพ Checkpoint 5.1 ให้ครบตอนนี้ ถ้ายังไม่ได้ทำ)
 
-```text
-บันทึกรูปผลลัพธ์ที่นี่
-```
+<img width="1917" height="951" alt="image" src="https://github.com/user-attachments/assets/fc4cf695-3597-43ec-9c6b-d6ef5db5cb45" />
 
----
+- **Firestore Integration:** ข้อมูลสินค้าที่ถูกโพสต์จากหน้าร่างประกาศ (`MyDraftsPage`) ถูกบันทึกลงใน Collection `items` บน Cloud Firestore สำเร็จ พร้อมเก็บฟิลด์ `sellerId` ตรงตาม UID ของผู้ใช้ และ `imageUrl` สำหรับแสดงผลรูปภาพ
+- **Multi-Source Aggregation (Checkpoint 5.1):** หน้าหลัก (`HomePage`) ดึงข้อมูลผ่าน `Future.wait()` จากทั้ง `ItemRepositoryApi` และ `ItemRepositoryFirestore` มารวมกันเป็น List เดียวและแสดงผลผ่าน `Image.network(item.imageUrl)` ได้อย่างสมบูรณ์
 
 ## ส่วนที่ 7 (Self-Study): สำรวจ Firebase Security Rules
 
