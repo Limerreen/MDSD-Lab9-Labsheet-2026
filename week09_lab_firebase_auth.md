@@ -741,9 +741,11 @@ service cloud.firestore {
 
 > ✅ **Checkpoint 7.1 (Self-Study)** ถ่ายภาพหน้าจอผลการทดลองทั้ง 2 กรณีใน Rules Playground เขียนอธิบายสั้น ๆ ว่าทำไม Client-side Validation (การไม่แสดงปุ่มแก้ไขให้เห็น) เพียงอย่างเดียวจึงไม่เพียงพอต่อความปลอดภัยของข้อมูลจริง
 
-```text
-บันทึกรูปผลลัพธ์ที่นี่ และคำอธิบาย
-```
+<img width="1816" height="853" alt="image" src="https://github.com/user-attachments/assets/7d4ec3ff-0fcb-4d35-b0f5-098d1b1a361b" />
+
+* **เหตุผลที่ Client-side Validation (การไม่แสดงปุ่มแก้ไขบน UI) เพียงอย่างเดียวไม่เพียงพอต่อความปลอดภัยของข้อมูลจริง**
+  1. **UI เป็นเพียงส่วนประสานผู้ใช้ (UX) ไม่ใช่ระบบรักษาความปลอดภัย** การซ่อนปุ่มแก้ไข/ลบบนหน้าจอ Flutter ช่วยเพียงป้องกันไม่ให้ผู้ใช้งานทั่วไปกดผิดพลาดเท่านั้น แต่ผู้ไม่ประสงค์ดีสามารถดักจับ HTTP Request, แอบดึง API Key/Firebase Config หรือใช้ Firebase SDK สั่งอัปเดต/ลบเอกสารใน Firestore โดยตรงได้โดยไม่ต้องผ่านหน้าจอแอปพลิเคชัน
+  2. **ความปลอดภัยที่แท้จริงต้องควบคุมที่ฝั่ง Server-side (Database Security Rules)** การตั้งค่า Security Rules บน Firestore จะช่วยตรวจสอบสิทธิ์และยืนยันตัวตน (`request.auth.uid == resource.data.sellerId`) ทุกครั้งที่มีการแก้ไขหรือลบข้อมูล ทำให้รับประกันได้ว่าข้อมูลจะไม่ถูกดัดแปลงโดยบุคคลอื่นที่ไม่ใช่เจ้าของเอกสาร แม้จะพยายามส่ง Request ตรงมาจากภายนอกก็ตาม
 
 ---
 
@@ -760,9 +762,16 @@ service cloud.firestore {
 
 > ✅ **Checkpoint 8.1** ถ่ายภาพหน้าจอผลการทดสอบทั้ง 4 ข้อ 
 
-```text
-บันทึกรูปผลลัพธ์ที่นี่ 
-```
+1. ล็อกอินค้างไว้ แล้วปิดแอปทิ้งไปทั้งหมด (ไม่ใช่แค่ย่อ) จากนั้นเปิดแอปใหม่อีกครั้ง — ควรเข้าหน้า `MainScaffold` ทันทีโดยไม่ต้องล็อกอินซ้ำ (Firebase Auth จำสถานะล็อกอินไว้ให้อัตโนมัติ)
+<img width="869" height="1883" alt="image" src="https://github.com/user-attachments/assets/2c25a6c6-ea87-4d2e-bead-a3311449dbbb" />
+<img width="869" height="1883" alt="image" src="https://github.com/user-attachments/assets/2837d1b5-225b-40cf-b832-d166f73b05d3" />
+
+
+2. ปิด WiFi/Data ของเครื่องให้หมด แล้วลองเปิดแท็บ "รายการโปรด" และ "ร่างของฉัน" — ควรยังใช้งานได้ปกติเพราะเก็บอยู่ใน Local Database (Drift) ไม่ต้องพึ่งเครือข่าย
+<img width="869" height="1883" alt="image" src="https://github.com/user-attachments/assets/b59bdbeb-7004-481b-acc1-136b98b2d4b4" />
+<img width="869" height="1883" alt="image" src="https://github.com/user-attachments/assets/9404948f-d2d4-4382-89e2-200030f63a1a" />
+<img width="869" height="1883" alt="image" src="https://github.com/user-attachments/assets/4006030a-14c6-4fdf-b2c7-37324e366f0b" />
+
 
 ---
 
