@@ -384,9 +384,19 @@ avdmanager list avd
 
 > ✅ **Checkpoint 3.1** ทดสอบกดปุ่มเข้าสู่ระบบด้วย Google ด้วยบัญชี Google จริงของคุณ ถ่ายภาพหน้าจอตอนเลือกบัญชี Google และภาพหน้าจอ Firebase Console ที่แสดงว่ามีผู้ใช้ใหม่ Provider เป็น Google เพิ่มเข้ามา อธิบายว่า `idToken` กับ `accessToken` ที่ได้จาก Google นำไปใช้ทำอะไรต่อในขั้นตอนการยืนยันตัวตนกับ Firebase (อ้างอิงหัวข้อ 9.4)
 
-```text
-บันทึกรูปผลลัพธ์ที่นี่ และคำอธิบาย
-```
+<img width="869" height="1883" alt="image" src="https://github.com/user-attachments/assets/d31533bc-cd66-4635-a23e-c1d362e06f81" />
+
+<img width="1842" height="721" alt="image" src="https://github.com/user-attachments/assets/e0e0a005-3282-4ed2-852a-42ccede4f401" />
+
+* **`idToken` (Identity Token)** เป็น JSON Web Token (JWT) ที่ออกโดย Google Identity Service เพื่อยืนยันตัวตนของผู้ใช้งาน (ประกอบด้วยข้อมูลพื้นฐาน เช่น Email, Name, Profile Picture) โดย **Firebase Authentication** จะใช้ `idToken` เป็นหลักในการพิสูจน์และตรวจสอบความถูกต้องว่าผู้ใช้เป็นตัวจริง
+* **`accessToken`:** เป็น OAuth 2.0 Access Token ที่ใช้สำหรับเป็นใบเบิกทางในการขอสิทธิ์เข้าถึงข้อมูลหรือบริการต่างๆ ของ Google APIs (Google Services) ตาม Scope ที่ขอไว้
+* **กระบวนการทำงานในระบบ (Authentication Handshake)**
+  1. แอปพลิเคชันทำการร้องขอ Token ทั้งสองจาก Google Sign-In SDK
+  2. นำ `idToken` และ `accessToken` มาประกอบกันเป็น Credentials ผ่านเมธอด `GoogleAuthProvider.credential(idToken: idToken, accessToken: accessToken)`
+  3. ส่ง Credentials ดังกล่าวให้ Firebase ผ่าน `FirebaseAuth.instance.signInWithCredential(...)`
+  4. Firebase ทำการ Verify ความถูกต้องของ Token และสร้าง User Session พร้อมออก User UID ในระบบให้อัตโนมัติ
+---
+``
 
 ---
 
