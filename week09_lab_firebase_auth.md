@@ -534,10 +534,20 @@ Widget build(BuildContext context) {
 > ✅ **Checkpoint 4.1** ถ่ายภาพหน้าจอ 3 ภาพเรียงกัน คือ (ก) แอปตอนเพิ่งเปิดขึ้นมาครั้งแรกแบบยังไม่ล็อกอิน แสดงหน้า Login (ข) หลังล็อกอินสำเร็จ แอปสลับไปแสดง `MainScaffold` อัตโนมัติโดยไม่ต้องกดอะไรเพิ่ม และ (ค) หลังกด "ออกจากระบบ" แอปสลับกลับไปหน้า Login เอง อธิบายว่าทำไมการใช้ `StreamBuilder` ฟัง `authStateChanges()` จึงทำให้ไม่ต้องเขียนโค้ดสั่ง Navigate ไปมาเอง
 
 
-```text
-บันทึกรูปผลลัพธ์ที่นี่ (3 ภาพ) และคำอธิบาย
-```
+<img width="869" height="1883" alt="image" src="https://github.com/user-attachments/assets/27a80471-8c1d-4957-975c-a77e93357be0" />
 
+<img width="869" height="1883" alt="image" src="https://github.com/user-attachments/assets/ca732086-3961-4daf-90a2-4948c9a6e3ee" />
+
+<img width="869" height="1883" alt="image" src="https://github.com/user-attachments/assets/4d61a348-eb18-4bec-90f1-ece11daa0da0" />
+
+<img width="869" height="1883" alt="image" src="https://github.com/user-attachments/assets/62cbbb18-6c0c-49eb-a916-9b67273a262b" />
+
+* **เหตุผลที่ไม่ต้องใช้ Navigator สลับหน้า**  
+  `FirebaseAuth.instance.authStateChanges()` ทำหน้าที่เป็น Event Stream ที่ส่งสถานะการเข้าสู่ระบบ (`User?`) แบบเรียลไทม์ และ `StreamBuilder` ใน `AuthGate` จะ Rebuild หน้าจอให้อัตโนมัติตามสถานะล่าสุด:
+  * ถ้าสถานะเป็น `null` ➔ แสดง `LoginPage()`
+  * ถ้าสถานะมีข้อมูล `User` ➔ แสดง `MainScaffold()`
+  
+  ทำให้โครงสร้าง UI สลับเปลี่ยนตามสถานะของ Firebase Session โดยตรง จึงไม่ต้องเขียนโค้ดสั่ง `Navigator.push()` หรือ `Navigator.pop()` เพื่อสลับหน้าจอด้วยตนเอง
 ---
 
 ## ส่วนที่ 5: ขยาย Repository Pattern ด้วย ItemRepositoryFirestore
@@ -549,9 +559,13 @@ Widget build(BuildContext context) {
 1. ทำไมเราจึง "เพิ่ม Implementation ใหม่" (`ItemRepositoryFirestore`) แทนที่จะแก้ไข `ItemRepositoryApi` เดิม หรือเขียนโค้ดเรียก Firestore ตรงจาก `HomePage`?
 2. ถ้าในอนาคตอาจารย์สั่งให้เปลี่ยนจาก Fake Store API ไปใช้ API อื่น ต้องแก้ไฟล์กี่ไฟล์ ถ้าทุก Widget เรียกผ่าน Interface `ItemRepository` เท่านั้น?
 
-```text
-บันทึกคำตอบของคุณที่นี่
-```
+สาเหตุที่เพิ่ม Implementation ใหม่ (ItemRepositoryFirestore) แทนการแก้ไขของเดิมหรือเรียกใช้ตรงจาก HomePage
+   - เพื่อปฏิบัติตามหลักการ Single Responsibility Principle (SRP) และ Open/Closed Principle (OCP) โดยการสร้าง Class ใหม่ที่ทำหน้าที่จัดการข้อมูล Firestore โดยเฉพาะ ทำให้โค้ดเดิมที่ไม่เกี่ยวข้องไม่ต้องถูกแก้ไขและเสี่ยงต่อการเกิดบั๊ก
+   - การซ่อน Logic การดึงข้อมูลไว้หลัง Interface ทำให้ UI Layer (HomePage) ทำหน้าที่จัดการเฉพาะส่วนแสดงผลเท่านั้น ไม่ต้องผูกติดกับ Firebase/Firestore Direct Calls ทำให้โค้ดมีความยืดหยุ่น ดูแลรักษาง่าย และทดสอบได้สะดวก
+
+2. จำนวนไฟล์ที่ต้องแก้ไขหากในอนาคตต้องการเปลี่ยนแหล่งข้อมูล API
+   - แก้ไขเพียงไฟล์เดียว คือไฟล์ที่ทำการสร้างหรือส่งผ่าน Instance ของ Repository (เช่น main.dart หรือ auth_gate.dart)
+   - ไม่ต้องแก้ไขไฟล์ Widget ต่าง ๆ เช่น HomePage แม้แต่บรรทัดเดียว เนื่องจาก Widget ทั้งหมดรับและเรียกใช้งานผ่าน Interface ItemRepository เท่านั้น
 
 ### ขั้นตอนที่ 5.2: **นักศึกษาเขียน Code เอง** — ItemRepositoryFirestore
 
@@ -622,10 +636,24 @@ final pages = [
 
 > ✅ **Checkpoint 5.1** ถ่ายภาพหน้าจอ Home ที่แสดงสินค้าจากทั้งสองแหล่งข้อมูลปนกันอยู่ในลิสต์เดียว พร้อม Badge ที่แยกแหล่งที่มาชัดเจน (ถ้ายังไม่เคยมีประกาศจริงใน Firestore เลย ให้ทำส่วนที่ 6 ให้เสร็จก่อนแล้วย้อนกลับมาถ่ายภาพ Checkpoint นี้) อธิบายว่าการออกแบบให้ `HomePage` ไม่รู้จัก `ItemRepositoryApi`/`ItemRepositoryFirestore` โดยตรง แต่รู้จักผ่าน Interface `ItemRepository` เท่านั้น ช่วยให้ทดสอบหรือเปลี่ยนแหล่งข้อมูลในอนาคตง่ายขึ้นอย่างไร
 
-```text
-บันทึกรูปผลลัพธ์ที่นี่ และคำอธิบาย
-```
+<img width="869" height="1883" alt="image" src="https://github.com/user-attachments/assets/ce316739-3eff-4f44-ad3b-07279e3102a7" />
 
+<img width="869" height="1883" alt="image" src="https://github.com/user-attachments/assets/ab8e9228-eb3d-439f-8b4d-6b2f78fce9fe" />
+
+<img width="869" height="1883" alt="image" src="https://github.com/user-attachments/assets/3b29837f-d397-497f-8c6c-a5285c995b36" />
+
+<img width="869" height="1883" alt="image" src="https://github.com/user-attachments/assets/998b340d-acf0-4f9d-a630-fb91fc2b08f7" />
+
+การออกแบบให้ `HomePage` สื่อสารผ่าน Interface `ItemRepository` โดยไม่ผูกติดกับ Implementation Concrete Class (`ItemRepositoryApi` หรือ `ItemRepositoryFirestore`) มีประโยชน์หลักในด้านความยืดหยุ่นและการทดสอบระบบ ดังนี้:
+
+* **การทดสอบระบบที่ง่ายและรวดเร็วขึ้น (Testability):**  
+  ในการทำ Unit Test หรือ UI Test สามารถสร้าง Mock Repository (เช่น `ItemRepositoryMock`) ขึ้นมาเพื่อส่งข้อมูลจำลองให้กับ `HomePage` ได้ทันที โดยไม่ต้องพึ่งพาการเชื่อมต่อเครือข่ายจริง (Network Request) หรือการดึงข้อมูลจาก Firebase Firestore จริง ทำให้การทดสอบทำงานได้รวดเร็ว แม่นยำ และไม่ส่งผลกระทบต่อข้อมูลในระบบจริง
+
+* **การเปลี่ยนหรือเพิ่มแหล่งข้อมูลในอนาคตทำได้ง่าย (Extensibility & Maintainability):**  
+  หากในอนาคตมีการเปลี่ยนแหล่งข้อมูล เช่น สลับไปใช้ API ตัวใหม่, เปลี่ยนระบบ Database หรือเพิ่ม Local Cache (เช่น SQLite / Drift) สามารถสร้าง Class ใหม่ที่ `implements ItemRepository` แล้วนำไปส่งต่อให้ `HomePage` ผ่าน Constructor ได้ทันที โดย**ไม่ต้องแก้ไขโค้ดการทำงานและการแสดงผลภายใน `HomePage` แม้แต่บรรทัดเดียว**
+
+* **เป็นไปตามหลักการออกแบบ Loose Coupling & Dependency Inversion:**  
+  ช่วยแยกความรับผิดชอบของ UI Layer (ส่วนแสดงผล) ออกจาก Data Layer (ส่วนจัดการข้อมูล) อย่างชัดเจน ส่งผลให้โครงสร้างโปรเจกต์มีความเป็นระเบียบ ซ่อมบำรุงง่าย และลดความเสี่ยงในการเกิดบั๊กจากการแก้ไขโค้ดข้าม Layer
 ---
 
 ## ส่วนที่ 6: "โพสต์ขายจริง" — เชื่อม MyDraftsPage เข้ากับ Storage และ Firestore
